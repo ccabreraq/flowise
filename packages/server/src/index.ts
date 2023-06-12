@@ -34,7 +34,8 @@ import {
     findAvailableConfigs,
     isSameOverrideConfig,
     replaceAllAPIKeys,
-    isFlowValidForStream
+    isFlowValidForStream,
+    isVectorStoreFaiss
 } from './utils'
 import { cloneDeep } from 'lodash'
 import { getDataSource } from './DataSource'
@@ -89,7 +90,7 @@ export class App {
             const basicAuthMiddleware = basicAuth({
                 users: { [username]: password }
             })
-            const whitelistURLs = ['/api/v1/prediction/', '/api/v1/node-icon/']
+            const whitelistURLs = ['/api/v1/prediction/', '/api/v1/node-icon/', '/api/v1/chatflows-streaming']
             this.app.use((req, res, next) => {
                 if (req.url.includes('/api/v1/')) {
                     whitelistURLs.some((url) => req.url.includes(url)) ? next() : basicAuthMiddleware(req, res, next)
@@ -634,6 +635,7 @@ export class App {
                 const nodeModule = await import(nodeInstanceFilePath)
                 const nodeInstance = new nodeModule.nodeClass()
 
+                isStreamValid = isStreamValid && !isVectorStoreFaiss(nodeToExecuteData)
                 const result = isStreamValid
                     ? await nodeInstance.run(nodeToExecuteData, incomingInput.question, {
                           chatHistory: incomingInput.history,
