@@ -659,6 +659,8 @@ export class App {
         try {
             const chatflowid = req.params.id
             let incomingInput: IncomingInput = req.body
+			console.log(req.params)
+			console.log(req.body)
 
             let nodeToExecuteData: INodeData
 
